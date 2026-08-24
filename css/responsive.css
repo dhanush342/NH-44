@@ -1,0 +1,23 @@
+/* ══════════ Responsive Breakpoints ══════════ */
+@media (max-height:420px){ 
+  :root{--ui-scale:0.85}
+  .sign h1{font-size:calc(42px * var(--ui-scale))} 
+  .sign{padding:calc(24px * var(--ui-scale)) calc(34px * var(--ui-scale)) calc(22px * var(--ui-scale))} 
+}
+@media (max-width:780px),(max-height:440px){
+  :root{--ui-scale:0.9}
+}
+@media (max-width:630px),(max-height:350px){
+  :root{--ui-scale:0.75}
+  .sign .posts{display:none}
+  .hint{display:none}
+  .keys{display:none}
+  .chips{display:none}
+}
+@media (max-width:480px),(max-height:280px){
+  :root{--ui-scale:0.65}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important}
+}

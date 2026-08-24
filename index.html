@@ -1,0 +1,209 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#05070f">
+<meta name="description" content="NH-44 — race across India with friends, cars, bikes, challenges, and a leaderboard.">
+<title>NH-44 — India's Highway Racer</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/russo-one@4.5.10/index.css">
+<link rel="stylesheet" href="/css/tokens.css">
+<link rel="stylesheet" href="/css/ui.css">
+<link rel="stylesheet" href="/css/responsive.css">
+<link rel="icon" type="image/png" href="/logo.png">
+</head>
+<body oncontextmenu="return false">
+<div id="app" role="application" aria-label="NH-44 India highway racing game">
+  <button class="skip" id="skipBtn" type="button">Skip to Start</button>
+  <div id="stage"></div>
+  <div id="vig" aria-hidden="true"></div>
+  <div id="nitrofx" aria-hidden="true"></div>
+  <div id="flash" aria-hidden="true"></div>
+  <div id="live" class="sr-only" role="status" aria-live="polite"></div>
+
+  <!-- HUD -->
+  <div id="hud" role="group" aria-label="HUD">
+    <div id="hudTL">
+      <div class="plate" id="scoreBox"><i>SCORE</i><b id="score">0</b></div>
+      <div class="plate" id="comboBox"><b id="comboV">COMBO ×1.0</b></div>
+      <div class="plate" id="shieldBox"><b id="shieldV">🛡 SHIELD ×1</b></div>
+    </div>
+    <div id="hudTR">
+      <div class="plate"><i>DIST</i><b id="dist">0.00 km</b></div> 
+      <div class="plate"><i>BEST</i><b id="best">0</b></div>
+      <div class="plate" id="locPlate"><i>REGION</i><b id="locV">—</b></div>
+      <div class="plate" id="rankPlate"><i>RANK</i><b id="rankV">#1</b></div>
+      <button class="ibtn" id="btnPause" type="button" aria-label="Pause (P)">⏸</button>
+      <button class="ibtn" id="btnMute" type="button" aria-label="Mute (M)" aria-pressed="false">🔊</button>
+    </div>
+    <div id="cluster">
+      <svg id="gauge" width="132" height="76" viewBox="0 0 132 76" aria-hidden="true">
+        <path d="M12 66 A54 54 0 0 1 120 66" stroke="#232b47" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <path id="gArc" d="M12 66 A54 54 0 0 1 120 66" stroke="#ffb03a" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6"/>
+        <g id="gNeedle" transform="rotate(-90 66 66)"><line x1="66" y1="66" x2="66" y2="24" stroke="#ff5040" stroke-width="4" stroke-linecap="round"/></g>
+        <circle cx="66" cy="66" r="6" fill="#ff5040"/>
+      </svg>
+      <div id="spdRow"><span id="spd">0</span><small>KM/H</small></div>
+    </div>
+    <div id="nitroWrap" aria-hidden="true"><label>N₂O</label><div id="nitroBar"><div id="nitroFill"></div></div></div>
+    <button id="t-left" class="tbtn" type="button" aria-label="Steer left">◀</button>
+    <button id="t-right" class="tbtn" type="button" aria-label="Steer right">▶</button>
+    <button id="t-brake" class="tbtn" type="button" aria-label="Brake">▼</button>
+    <button id="t-nitro" class="tbtn" type="button" aria-label="Nitro boost">N₂O</button>
+    <button id="t-horn" class="tbtn" type="button" aria-label="Horn">HORN</button>
+  </div>
+
+  <div id="floaters" aria-hidden="true"></div>
+  <div class="plate" id="toast" aria-hidden="true"><b id="toastV"></b></div>
+  <div id="banner" aria-hidden="true"><div class="plate"><b id="bannerV">—</b><i id="bannerE">—</i></div></div>
+  <div id="count" aria-hidden="true">3</div>
+
+  <!-- Name overlay -->
+  <div class="ov hide" id="nameOv" role="dialog" aria-modal="true" aria-labelledby="nameTitle">
+    <div class="panel">
+      <h2 class="amber" id="nameTitle"> WELCOME TO NH-44</h2>
+      <div class="tag">INDIA'S LONGEST NATIONAL HIGHWAY · 3,745 KM · SRINAGAR → KANYAKUMARI</div>
+      <label class="lbl" for="nameIn">DRIVER NAME</label>
+      <input id="nameIn" class="codebox" maxlength="14" placeholder="Enter your name…" autocomplete="off" data-autofocus>
+      <label class="lbl" for="namePass">PASSWORD</label>
+      <input id="namePass" class="codebox" type="password" maxlength="18" placeholder="Create or enter your password…" autocomplete="new-password">
+      <div class="savetip" style="text-align:center;margin-top:10px">Your account is matched by name + password, so the same driver cannot be added twice.</div>
+      <div class="row"><button class="abtn big" id="btnNameOk" type="button"> START JOURNEY</button></div>
+    </div>
+  </div>
+
+  <!-- Menu -->
+  <div class="ov" id="menu" role="dialog" aria-modal="true" aria-label="Main menu">
+    <div class="wrap">
+      <div class="sign"><img class="nh-logo" src="/logo.png" alt="NH-44 logo"><div class="route">NH 44 · INDIA</div>
+        <h1>NH-44</h1><div class="sub">INDIA'S HIGHWAY RACER</div>
+        <div class="posts"></div>
+      </div>
+      <div class="mside">
+        <div class="mrow">
+          <div class="plate"><span>👤 <b id="menuName" style="color:var(--cyan)">DRIVER</b></span></div>
+          <div class="plate"><span>🏆 BEST <b id="menuBest" style="color:var(--gold)">0</b></span></div>
+          <div class="plate goldplate"><span>💰 <b id="menuGold">0</b></span></div>
+        </div>
+        <div class="chips">
+          <div class="chip"><b>◀ ▶</b>Steer</div>
+          <div class="chip"><b>N₂O</b>Space</div>
+          <div class="chip"><b>▼</b>Brake</div>
+          <div class="chip"><b>H</b>Horn</div>
+          <div class="chip"><b>Tab</b>Nav</div>
+        </div>
+        <div class="mrow2">
+          <button class="abtn big" id="btnStart" type="button" data-autofocus>🔑 START ENGINE</button>
+          <button class="abtn cyan" id="btnGarage" type="button">🔧 GARAGE</button>
+        </div>
+        <div class="hint">📱 Portrait auto-rotates · near misses build combos<br>
+        🏁 Speed banks · clean checkpoints · combo milestones · horn<br>
+        💾 Copy save code to share with friends — race each other!<br>
+        🏍 Unlock bikes · 🏁 Beat friends · 🏆 Climb the leaderboard</div>
+        <div><button class="abtn ghost small" id="btnName" type="button">✏️ CHANGE NAME</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Garage -->
+  <div class="ov hide" id="garage" role="dialog" aria-modal="true" aria-label="Garage">
+    <div class="gpanel">
+      <div class="ghead">
+        <div class="gtitle"><b>🔧 GARAGE</b><i>VEHICLES · SOCIAL · UPGRADES</i></div>
+        <div class="plate"><span>👤 <b id="garName" style="color:var(--cyan)">-</b></span></div>
+        <div class="plate goldplate"><span>💰 <b id="garGold">0</b></span></div>
+        <button class="abtn ghost small" id="btnGarBack" type="button">← BACK</button>
+      </div>
+      <div class="gtabs" role="tablist" aria-label="Garage tabs">
+        <button class="gtab on" data-tab="upg" type="button" data-autofocus>UPGRADES</button>
+        <button class="gtab" data-tab="cars" type="button">VEHICLES</button>
+        <button class="gtab" data-tab="chal" type="button">CHALLENGES</button>
+        <button class="gtab" data-tab="friends" type="button">FRIENDS</button>
+        <button class="gtab" data-tab="lb" type="button">LEADERBOARD</button>
+        <button class="gtab" data-tab="ach" type="button">ACHIEVEMENTS</button>
+        <button class="gtab" data-tab="stats" type="button">STATS</button>
+        <button class="gtab" data-tab="save" type="button">SAVE</button>
+      </div>
+      <div class="gbody scrollable">
+        <div id="tab-upg" class="tabpane"></div>
+        <div id="tab-cars" class="tabpane hide"></div>
+        <div id="tab-chal" class="tabpane hide"></div>
+        <div id="tab-friends" class="tabpane hide"></div>
+        <div id="tab-lb" class="tabpane hide"></div>
+        <div id="tab-ach" class="tabpane hide"></div>
+        <div id="tab-stats" class="tabpane hide"></div>
+        <div id="tab-save" class="tabpane hide">
+          <div class="savetip">Progress is stored locally. <b>Share your save code with friends</b> — importing it adds them to your friends list!</div>
+          <label class="lbl" for="codeOut">YOUR SAVE CODE</label>
+          <textarea id="codeOut" class="codebox" rows="2" readonly spellcheck="false"></textarea>
+          <div class="saverow">
+            <button class="abtn cyan small" id="btnCopyCode" type="button">📋 COPY</button>
+            <button class="abtn ghost small" id="btnRefreshCode" type="button">🔄 REFRESH</button>
+          </div>
+          <hr class="sep">
+          <label class="lbl" for="codeIn">IMPORT (paste friend's code)</label>
+          <textarea id="codeIn" class="codebox" rows="2" placeholder="Paste friend's save code…" spellcheck="false"></textarea>
+          <div class="saverow">
+            <button class="abtn small" id="btnImport" type="button">📥 IMPORT</button>
+            <button class="abtn ghost small" id="btnAddFriend" type="button">👥 ADD AS FRIEND ONLY</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Over -->
+  <div class="ov hide" id="over" role="dialog" aria-modal="true" aria-labelledby="overTitle">
+    <div class="panel">
+      <h2 class="red" id="overTitle">💥 WRECKED!</h2>
+      <div class="tag">DRIVER: <span id="goName">—</span> · REGION: <span id="goLoc">—</span> · BIOME: <span id="goBiome">—</span></div>
+      <div class="bigscore"><span id="goScore">0</span><br><small>FINAL SCORE</small></div>
+      <div id="newRec">★ NEW RECORD ★</div>
+      <div class="gorow">
+        <div class="plate goldplate"><span>💰 EARNED <b id="goGold">+0</b></span></div>
+        <button class="abtn ghost small" id="btnCopyOver" type="button">📋 COPY CODE</button>
+      </div>
+      <div id="goAchList"></div>
+      <div class="stats">
+        <div>Distance<b id="goDist">0 km</b></div><div>Coins<b id="goCoins">0</b></div>
+        <div>Best combo<b id="goCombo">×1.0</b></div><div>Close passes<b id="goMiss">0</b></div>
+        <div>Speed banks<b id="goSpeedBanks">0</b></div>
+        <div>Clean distance<b id="goClean">0 km</b></div>
+        <div>Vehicle<b id="goVeh">—</b></div><div>All-time<b id="goBest">0</b></div>
+      </div>
+      <div id="goFriendBeat" style="color:var(--green);font-family:var(--fd);margin:10px 0"></div>
+      <div class="row">
+        <button class="abtn cyan" id="btnAgain" type="button" data-autofocus>🔄 AGAIN</button>
+        <button class="abtn ghost" id="btnHome" type="button">🏠 HOME</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pause -->
+  <div class="ov hide" id="pauseOv" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
+    <div class="panel">
+      <h2 class="amber" id="pauseTitle">⏸ PAUSED</h2>
+      <div class="tag">NH-44 · ON HOLD</div>
+      <div class="keys">
+        <b>◀ ▶ / A D</b> steer &nbsp; <b>▼ / S</b> brake &nbsp; <b>Space / Shift</b> nitro<br>
+        <b>P / Esc</b> pause &nbsp; <b>M</b> mute &nbsp; <b>Tab</b> navigate
+      </div>
+      <div class="row">
+        <button class="abtn" id="btnResume" type="button" data-autofocus>▶ RESUME</button>
+        <button class="abtn cyan" id="btnRestart" type="button">🔄 RESTART</button>
+        <button class="abtn ghost" id="btnHome2" type="button">🏠 HOME</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="ov hide" id="err" role="alert"><div>⚠ Could not initialize 3D engine<br>Need WebGL support</div></div>
+  <div id="dbg" role="alert"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script type="module" src="/js/main.js"></script>
+</body>
+</html>
