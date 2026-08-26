@@ -5,6 +5,7 @@ import {Social} from './social.js';
 import {Scene} from './scene.js';
 import {UPGRADES, VEHICLES, ACHIEVEMENTS} from './config.js';
 import {Game} from './game.js';
+import {escapeHtml} from './utils.js';
 
 export const UI = (() => {
   /* Fallback dummy element: setting textContent/classList on it is harmless.
@@ -57,8 +58,6 @@ export const UI = (() => {
   const fmtG = n => n >= 10000 ? (n/1000).toFixed(0) + 'k' : String(n);
   const bits = n => { let c = 0; while(n){ c += n & 1; n >>= 1; } return c; };
   const css = n => '#' + n.toString(16).padStart(6,'0');
-  const escapeHtml = s => String(s).replace(/[&<>"']/g, c =>
-    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   function refreshNameUI(){
     const n = SaveManager.self().name || 'DRIVER';

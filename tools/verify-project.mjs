@@ -6,7 +6,7 @@ const root = process.argv[2] || process.cwd();
 const required = [
   'index.html','vercel.json','js/main.js','js/config.js','js/save.js','js/audio.js',
   'js/scene.js','js/models.js','js/traffic.js','js/particles.js','js/input.js',
-  'js/social.js','js/ui.js','js/game.js','css/tokens.css','css/ui.css','css/responsive.css'
+  'js/social.js','js/ui.js','js/game.js','js/utils.js','css/tokens.css','css/ui.css','css/responsive.css'
 ];
 let bad = 0;
 for(const f of required){
