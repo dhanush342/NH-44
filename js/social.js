@@ -1,6 +1,7 @@
 /* ══════════ Leaderboard, Friends, Challenges ══════════ */
 import {SaveManager} from './save.js';
 import {CHALLENGES, ACHIEVEMENTS} from './config.js';
+import {escapeHtml} from './utils.js';
 
 export const Social = {
   renderLeaderboard(el) {
@@ -93,9 +94,3 @@ export const Social = {
     el.innerHTML = '<div class="savetip" style="margin-bottom:12px">Complete challenges to earn bonus gold. Some unlock when you play with friends!</div>' + html;
   }
 };
-
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[c]));
-}
