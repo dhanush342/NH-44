@@ -1,0 +1,23 @@
+{
+  "name": "primary",
+  "version": "1.0.0",
+  "description": "A browser-first 3D endless highway racer running on Three.js/WebGL with procedural Web Audio. Race Srinagar → Kanyakumari, unlock cars and bikes, build combos, collect nitro/coins, dodge traffic, and climb the local/friend leaderboard.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dhanush342/NH-44.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dhanush342/NH-44/issues"
+  },
+  "homepage": "https://github.com/dhanush342/NH-44#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
