@@ -119,8 +119,15 @@ export const SaveManager = (() => {
     let out = s.padStart(48,'0').replace(/(.{4})/g,'$1-').replace(/-$/,'');
     const meta = {
       name: SAVE.name,
-      account: { name: SAVE.account?.name || SAVE.name, passHash: SAVE.account?.passHash || '' },
-      friends: SAVE.friends.slice(0,10),
+      account: { name: SAVE.account?.name || SAVE.name },
+      friends: SAVE.friends.slice(0,10).map(f => ({
+        name: f.name,
+        best: f.best,
+        t: f.t,
+        veh: f.veh,
+        dist: f.dist,
+        account: f.account ? { name: f.account.name } : null
+      })),
       lb: SAVE.lb.slice(0,15)
     };
     try { out += '.' + btoa(encodeURIComponent(JSON.stringify(meta))); } catch(e) {}
