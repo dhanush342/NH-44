@@ -129,8 +129,13 @@ import {SaveManager} from './save.js';
 
   function startGame(){
     Audio.sfx.click();
-    try{ if(screen.orientation && screen.orientation.lock)
-      screen.orientation.lock('landscape').catch(()=>{}); }catch(e){}
+    if(MOBILE || navigator.userAgentData?.mobile){
+      try{
+        if(screen.orientation && typeof screen.orientation.lock === 'function'){
+          screen.orientation.lock('landscape').catch(()=>{});
+        }
+      }catch(e){}
+    }
     ['menu','over','pauseOv','garage','nameOv'].forEach(id => UI.hideOv($(id)));
     if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
     Game.resetRun();
@@ -254,6 +259,9 @@ import {SaveManager} from './save.js';
   /* Main loop — protected */
   const clock = new THREE.Clock();
   let demoInit = false, errShown = false;
+  const FIXED_STEP = 1 / 60;
+  let accumulator = 0;
+
   function safeUpdate(dt, raw){
     try{
       Game.update(dt, raw, Input.keys(), Input.touch(), onGameEvent);
@@ -263,7 +271,6 @@ import {SaveManager} from './save.js';
         const d = $('dbg');
         if(d){ d.textContent = '⚠ Recovered from: ' + (err.message || err); d.classList.add('show'); }
       }
-      // Force a clean game-over instead of freezing
       if(Game.S.mode !== 'over'){
         try{
           const r = Game.finalizeRun();
@@ -285,7 +292,7 @@ import {SaveManager} from './save.js';
       }
       return;
     }
-    const raw = Math.min(clock.getDelta(), .05);
+    const raw = Math.min(clock.getDelta(), 0.05);
 
     /* FPS sampling */
     Perf.t += raw; Perf.f++;
@@ -302,6 +309,7 @@ import {SaveManager} from './save.js';
       Game.resetRun(); Game.setMode('menu'); Game.S.speed = 24;
       Traffic.populateMenu();
     }
+
     if(Game.S.mode === 'count'){
       const S = Game.S;
       S.cdT -= raw;
@@ -328,7 +336,11 @@ import {SaveManager} from './save.js';
     }else if(Game.S.mode === 'pause' || Game.S.mode === 'over'){
       /* frozen */
     }else{
-      safeUpdate(raw * Game.S.timescale, raw);
+      accumulator += raw;
+      while(accumulator >= FIXED_STEP){
+        safeUpdate(FIXED_STEP * Game.S.timescale, FIXED_STEP);
+        accumulator -= FIXED_STEP;
+      }
     }
     UI.updateHUD(Game.S, 1 + Math.min(Game.S.combo, 30) * .08);
     Scene.renderer.render(Scene.scene, Scene.camera);

@@ -1,6 +1,27 @@
 /* ══════════ Traffic AI (Cars, Trucks, Buses, Autos) ══════════ */
 import {TRAFFIC_COLORS, LANES} from './config.js';
 
+export const SpatialGrid = {
+  cellSize: 20,
+  cells: new Map(),
+  clear() { this.cells.clear(); },
+  key(z) { return Math.floor(z / this.cellSize); },
+  insert(v) {
+    if(!v.active) return;
+    const k = this.key(v.z);
+    if(!this.cells.has(k)) this.cells.set(k, []);
+    this.cells.get(k).push(v);
+  },
+  getNearby(z) {
+    const k = this.key(z);
+    return [
+      ...(this.cells.get(k - 1) || []),
+      ...(this.cells.get(k) || []),
+      ...(this.cells.get(k + 1) || [])
+    ];
+  }
+};
+
 export const Traffic = (() => {
   let list = [];
   let Scene = null, Models = null;

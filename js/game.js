@@ -4,7 +4,7 @@ import {SaveManager} from './save.js';
 import {Audio} from './audio.js';
 import {Scene} from './scene.js';
 import {Models} from './models.js';
-import {Traffic} from './traffic.js';
+import {Traffic, SpatialGrid} from './traffic.js';
 import {Particles} from './particles.js';
 
 export const Game = (() => {
@@ -405,6 +405,9 @@ export const Game = (() => {
     if(P.steerR)P.steerR.rotation.y=steerVis;
     const wspin=S.speed*dt/(P.isBike?.32:.35);
     P.wheels.forEach(w=>w.rotation.x-=wspin);
+
+    SpatialGrid.clear();
+    for(const c of Traffic.list()) if(c.active) SpatialGrid.insert(c);
 
     for(const c of Traffic.list()){
       if(!c.active)continue;

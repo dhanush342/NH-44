@@ -103,6 +103,20 @@ export const UI = (() => {
     announce('Entering ' + b.name);
     setTimeout(() => el.banner.classList.remove('show'), 2600);
   }
+  /* Reusable floater DOM pool */
+  let floaterPool = null;
+  function getFloaterPool(){
+    if(floaterPool) return floaterPool;
+    const parent = document.getElementById('floaters');
+    floaterPool = Array.from({length: 24}, () => {
+      const el = document.createElement('div');
+      el.className = 'fl hide';
+      if(parent) parent.appendChild(el);
+      return {el, active: false, timer: null};
+    });
+    return floaterPool;
+  }
+
   function floater(worldPos, text, cls){
     try{
       const v = worldPos.clone().project(Scene.camera);
@@ -110,13 +124,18 @@ export const UI = (() => {
       const app = document.getElementById('app');
       const W = app ? app.clientWidth : innerWidth;
       const H = app ? app.clientHeight : innerHeight;
-      const d = document.createElement('div');
-      d.className = 'fl ' + cls;
-      d.textContent = text;
-      d.style.left = ((v.x*.5+.5)*W) + 'px';
-      d.style.top = ((-v.y*.5+.5)*H - 20) + 'px';
-      document.getElementById('floaters').appendChild(d);
-      setTimeout(() => d.remove(), 950);
+      const pool = getFloaterPool();
+      const item = pool.find(f => !f.active) || pool[0];
+      if(item.timer) clearTimeout(item.timer);
+      item.active = true;
+      item.el.className = 'fl ' + cls;
+      item.el.textContent = text;
+      item.el.style.left = ((v.x * 0.5 + 0.5) * W) + 'px';
+      item.el.style.top = ((-v.y * 0.5 + 0.5) * H - 20) + 'px';
+      item.timer = setTimeout(() => {
+        item.el.className = 'fl hide';
+        item.active = false;
+      }, 950);
     }catch(e){}
   }
 
