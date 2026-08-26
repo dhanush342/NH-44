@@ -3,6 +3,14 @@ import {SaveManager} from './save.js';
 import {CHALLENGES, ACHIEVEMENTS} from './config.js';
 import {escapeHtml} from './utils.js';
 
+function formatTimeAgo(timestamp) {
+  const t = Date.now() - (timestamp || 0);
+  return t < 60000 ? 'just now' :
+         t < 3600000 ? Math.floor(t / 60000) + 'm ago' :
+         t < 86400000 ? Math.floor(t / 3600000) + 'h ago' :
+         Math.floor(t / 86400000) + 'd ago';
+}
+
 export const Social = {
   renderLeaderboard(el) {
     const save = SaveManager.self();
@@ -14,11 +22,7 @@ export const Social = {
     const me = save.name || 'SELF';
     const html = lb.map((e, i) => {
       const isMe = e.name === me && !e.friend;
-      const t = Date.now() - (e.t || 0);
-      const ago = t < 60000 ? 'just now' :
-                  t < 3600000 ? Math.floor(t/60000) + 'm ago' :
-                  t < 86400000 ? Math.floor(t/3600000) + 'h ago' :
-                  Math.floor(t/86400000) + 'd ago';
+      const ago = formatTimeAgo(e.t);
       const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
       const badge = e.friend ? '<span class="badge">FRIEND</span>' : (isMe ? '<span class="badge">YOU</span>' : '');
       return `<div class="lbrow ${isMe?'me':''}">
@@ -41,11 +45,7 @@ export const Social = {
       return;
     }
     const html = friends.map(f => {
-      const t = Date.now() - (f.t || 0);
-      const ago = t < 60000 ? 'just now' :
-                  t < 3600000 ? Math.floor(t/60000) + 'm ago' :
-                  t < 86400000 ? Math.floor(t/3600000) + 'h ago' :
-                  Math.floor(t/86400000) + 'd ago';
+      const ago = formatTimeAgo(f.t);
       const beat = save.best > f.best ? '✓ You lead' : (save.best < f.best ? '↑ Beat them!' : 'Tied');
       return `<div class="friendrow">
         <div class="friendico">👤</div>
