@@ -424,10 +424,8 @@ export const Game = (() => {
             if(c.blinkMat)c.blinkMat.emissiveIntensity=.1;}}
         else if(Math.random()<dt*.12){
           const d2=Math.random()<.5?-1:1, tl=c.lane+d2;
-          if(tl>=1&&tl<=3){let free=true;
-            for(const o of Traffic.list())
-              if(o.active&&!o.dead&&o.lane===tl&&Math.abs(o.z-c.z)<26)free=false;
-            if(free){c.targetLane=tl;c.changeT=1.1;}}}}
+          if(tl>=1&&tl<=3){
+            if(Traffic.isLaneFree(tl,c.z,26)){c.targetLane=tl;c.changeT=1.1;}}}}
       c.g.position.set(c.x,Math.sin(S.t*9+c.z*.4)*.02,c.z);
       c.g.rotation.y=c.oncoming?Math.PI:clamp((LANES[c.lane]-c.x)*.15,-.3,.3);
       c.wheels.forEach(w=>w.rotation.x-=c.speed*dt/.4);

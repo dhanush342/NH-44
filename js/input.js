@@ -55,6 +55,7 @@ export const Input = (() => {
     bindT('t-right', 'R');
     bindT('t-nitro', 'N');
     bindT('t-brake', 'B');
+    bindT('t-horn', 'H');
 
     document.addEventListener('touchmove', e => {
       if(e.target.closest && e.target.closest('.scrollable')) return;

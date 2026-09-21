@@ -15,7 +15,27 @@ export const UI = (() => {
   const el = {}, gEl = {};
   let toastT = null;
 
+  /* Reusable DOM Floater Pool to avoid DOM thrashing & GC memory leaks */
+  const FLOATER_POOL_SIZE = 24;
+  const floaterPool = [];
+
+  function initFloaters(){
+    try{
+      const parent = document.getElementById('floaters');
+      if(!parent) return;
+      parent.innerHTML = '';
+      floaterPool.length = 0;
+      for(let i = 0; i < FLOATER_POOL_SIZE; i++){
+        const d = document.createElement('div');
+        d.className = 'fl hide';
+        parent.appendChild(d);
+        floaterPool.push({ el: d, active: false, timer: null });
+      }
+    }catch(e){}
+  }
+
   function init(){
+    initFloaters();
     ['score','comboBox','comboV','shieldBox','shieldV','dist','best','spd',
      'gArc','gNeedle','nitroFill','tNitro','toast','toastV','banner',
      'bannerV','bannerE','count','flash','nitrofx','menu','menuBest',
@@ -109,13 +129,25 @@ export const UI = (() => {
       const app = document.getElementById('app');
       const W = app ? app.clientWidth : innerWidth;
       const H = app ? app.clientHeight : innerHeight;
-      const d = document.createElement('div');
-      d.className = 'fl ' + cls;
-      d.textContent = text;
-      d.style.left = ((v.x*.5+.5)*W) + 'px';
-      d.style.top = ((-v.y*.5+.5)*H - 20) + 'px';
-      document.getElementById('floaters').appendChild(d);
-      setTimeout(() => d.remove(), 950);
+      const x = ((v.x * 0.5 + 0.5) * W);
+      const y = ((-v.y * 0.5 + 0.5) * H - 20);
+
+      if(!floaterPool.length) initFloaters();
+      let item = floaterPool.find(f => !f.active);
+      if(!item) item = floaterPool[0]; // fallback: reuse oldest active item if pool exhausted
+
+      if(item.timer) clearTimeout(item.timer);
+      item.active = true;
+      item.el.className = 'fl ' + cls;
+      item.el.textContent = text;
+      item.el.style.left = x + 'px';
+      item.el.style.top = y + 'px';
+
+      item.timer = setTimeout(() => {
+        item.el.className = 'fl hide';
+        item.active = false;
+        item.timer = null;
+      }, 950);
     }catch(e){}
   }
 

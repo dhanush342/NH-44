@@ -4,8 +4,22 @@ import {TRAFFIC_COLORS, LANES} from './config.js';
 export const Traffic = (() => {
   let list = [];
   let Scene = null, Models = null;
+  const activeByLane = [[], [], [], []];
 
   function init(S, M) { Scene = S; Models = M; }
+
+  function updateLaneIndices() {
+    activeByLane[0].length = 0;
+    activeByLane[1].length = 0;
+    activeByLane[2].length = 0;
+    activeByLane[3].length = 0;
+    for (let i = 0; i < list.length; i++) {
+      const c = list[i];
+      if (c.active && !c.dead && c.lane >= 0 && c.lane <= 3) {
+        activeByLane[c.lane].push(c);
+      }
+    }
+  }
 
   function build() {
     list = [];
@@ -57,9 +71,21 @@ export const Traffic = (() => {
   }
 
   function laneBlocked(l, z) {
-    for(const c of list)
-      if(c.active && c.lane === l && c.z < z + 45) return true;
+    updateLaneIndices();
+    const laneVehicles = activeByLane[l] || [];
+    for (let i = 0; i < laneVehicles.length; i++) {
+      if (laneVehicles[i].z < z + 45) return true;
+    }
     return false;
+  }
+
+  function isLaneFree(l, z, distThreshold = 26) {
+    updateLaneIndices();
+    const laneVehicles = activeByLane[l] || [];
+    for (let i = 0; i < laneVehicles.length; i++) {
+      if (Math.abs(laneVehicles[i].z - z) < distThreshold) return false;
+    }
+    return true;
   }
 
   function clear() {
@@ -76,6 +102,6 @@ export const Traffic = (() => {
   const rnd = (a, b) => a + Math.random() * (b - a);
 
   return {
-    init, build, spawn, clear, populateMenu, list: () => list, laneBlocked
+    init, build, spawn, clear, populateMenu, list: () => list, laneBlocked, isLaneFree
   };
 })();
