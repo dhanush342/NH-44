@@ -25,6 +25,21 @@ export const Audio = (() => {
     if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
   }
 
+  function unlockAudioContext() {
+    const unlock = () => {
+      resume();
+      if (ctx && ctx.state === 'running') {
+        window.removeEventListener('pointerdown', unlock);
+        window.removeEventListener('keydown', unlock);
+        window.removeEventListener('touchstart', unlock);
+      }
+    };
+    window.addEventListener('pointerdown', unlock, { passive: true });
+    window.addEventListener('keydown', unlock, { passive: true });
+    window.addEventListener('touchstart', unlock, { passive: true });
+  }
+  unlockAudioContext();
+
   function tone(freq, duration, type = 'sine', volume = 0.045, slide = 0) {
     if (muted) return;
     const c = init();
@@ -34,31 +49,39 @@ export const Audio = (() => {
       const now = c.currentTime;
       const osc = c.createOscillator();
       const gain = c.createGain();
+      const f = Math.max(20, freq);
+      const dur = Math.max(0.01, duration);
+      const vol = Math.max(0.0001, volume);
+
       osc.type = type;
-      osc.frequency.setValueAtTime(Math.max(20, freq), now);
-      if (slide) osc.frequency.exponentialRampToValueAtTime(Math.max(20, freq + slide), now + duration);
+      osc.frequency.setValueAtTime(f, now);
+      if (slide) osc.frequency.exponentialRampToValueAtTime(Math.max(20, f + slide), now + dur);
+
       gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, volume), now + 0.008);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      gain.gain.exponentialRampToValueAtTime(vol, now + Math.min(0.008, dur * 0.2));
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
       osc.connect(gain).connect(c.destination);
       osc.start(now);
-      osc.stop(now + duration + 0.02);
+      osc.stop(now + dur + 0.02);
     } catch (e) {}
   }
 
-
-  function noise(duration=0.16, volume=0.03, filterFreq=900) {
+  function noise(duration = 0.16, volume = 0.03, filterFreq = 900) {
     if (muted) return;
     const c = init(); if (!c) return; resume();
     try {
-      const now=c.currentTime, len=Math.max(1,Math.floor(c.sampleRate*duration));
-      const b=c.createBuffer(1,len,c.sampleRate), d=b.getChannelData(0);
-      for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*(1-i/len);
-      const src=c.createBufferSource(), f=c.createBiquadFilter(), g=c.createGain();
-      f.type='bandpass'; f.frequency.value=filterFreq; f.Q.value=.7;
-      g.gain.setValueAtTime(.0001,now); g.gain.exponentialRampToValueAtTime(volume,now+.006);
-      g.gain.exponentialRampToValueAtTime(.0001,now+duration);
-      src.buffer=b; src.connect(f).connect(g).connect(c.destination); src.start(now); src.stop(now+duration+.01);
+      const dur = Math.max(0.01, duration);
+      const vol = Math.max(0.0001, volume);
+      const now = c.currentTime, len = Math.max(1, Math.floor(c.sampleRate * dur));
+      const b = c.createBuffer(1, len, c.sampleRate), d = b.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+      const src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+      f.type = 'bandpass'; f.frequency.value = Math.max(20, filterFreq); f.Q.value = .7;
+      g.gain.setValueAtTime(.0001, now);
+      g.gain.exponentialRampToValueAtTime(vol, now + Math.min(.006, dur * 0.2));
+      g.gain.exponentialRampToValueAtTime(.0001, now + dur);
+      src.buffer = b; src.connect(f).connect(g).connect(c.destination); src.start(now); src.stop(now + dur + .01);
     } catch(e){}
   }
 

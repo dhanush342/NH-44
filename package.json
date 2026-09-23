@@ -1,6 +1,7 @@
 {
   "name": "primary",
   "version": "1.0.0",
+  "type": "module",
   "description": "A browser-first 3D endless highway racer running on Three.js/WebGL with procedural Web Audio. Race Srinagar → Kanyakumari, unlock cars and bikes, build combos, collect nitro/coins, dodge traffic, and climb the local/friend leaderboard.",
   "main": "index.js",
   "scripts": {

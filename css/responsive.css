@@ -17,6 +17,45 @@
 @media (max-width:480px),(max-height:280px){
   :root{--ui-scale:0.65}
 }
+/* Safe Area & Touch Target Safe Alignment for Mobile */
+@media (pointer: coarse) {
+  .tbtn {
+    min-width: calc(58px * var(--ui-scale));
+    min-height: calc(58px * var(--ui-scale));
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #t-left {
+    left: max(calc(16px * var(--ui-scale)), env(safe-area-inset-left));
+    bottom: max(calc(16px * var(--ui-scale)), env(safe-area-inset-bottom));
+  }
+  #t-right {
+    left: max(calc(106px * var(--ui-scale)), calc(env(safe-area-inset-left) + calc(88px * var(--ui-scale))));
+    bottom: max(calc(16px * var(--ui-scale)), env(safe-area-inset-bottom));
+  }
+  #t-nitro {
+    right: max(calc(14px * var(--ui-scale)), env(safe-area-inset-right));
+    bottom: max(calc(14px * var(--ui-scale)), env(safe-area-inset-bottom));
+  }
+  #t-brake {
+    right: max(calc(126px * var(--ui-scale)), calc(env(safe-area-inset-right) + calc(110px * var(--ui-scale))));
+    bottom: max(calc(26px * var(--ui-scale)), env(safe-area-inset-bottom));
+  }
+  #t-horn {
+    right: max(calc(116px * var(--ui-scale)), calc(env(safe-area-inset-right) + calc(100px * var(--ui-scale))));
+    bottom: max(calc(18px * var(--ui-scale)), env(safe-area-inset-bottom));
+  }
+  #hudTL {
+    left: max(calc(14px * var(--ui-scale)), env(safe-area-inset-left));
+    top: max(calc(12px * var(--ui-scale)), env(safe-area-inset-top));
+  }
+  #hudTR {
+    right: max(calc(14px * var(--ui-scale)), env(safe-area-inset-right));
+    top: max(calc(12px * var(--ui-scale)), env(safe-area-inset-top));
+  }
+}
+
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;
     transition-duration:.01ms!important}
