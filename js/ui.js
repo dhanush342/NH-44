@@ -34,6 +34,33 @@ export const UI = (() => {
     }catch(e){}
   }
 
+  const GAME_TIPS = [
+    '💡 <b>TIP:</b> Near misses & close passes build your score combo multiplier!',
+    '💡 <b>TIP:</b> Maintain high speed to trigger Speed Banks for massive bonus points.',
+    '💡 <b>TIP:</b> Collect blue N₂O canisters or hit ramps to extend your nitro boost.',
+    '💡 <b>TIP:</b> Share your Save Code with friends to race their ghosts on the leaderboard!',
+    '💡 <b>TIP:</b> Unlock nimble bikes in the Garage for superior highway agility.'
+  ];
+  let currentTipIdx = 0;
+
+  function startTipCycle(){
+    const tipEl = byId('menuTip');
+    if(!tipEl) return;
+    setInterval(() => {
+      currentTipIdx = (currentTipIdx + 1) % GAME_TIPS.length;
+      tipEl.style.opacity = '0';
+      setTimeout(() => {
+        tipEl.innerHTML = GAME_TIPS[currentTipIdx];
+        tipEl.style.opacity = '1';
+      }, 300);
+    }, 4500);
+  }
+
+  function setHUDVisible(vis){
+    const hud = byId('hud');
+    if(hud) hud.style.display = vis ? 'block' : 'none';
+  }
+
   function init(){
     initFloaters();
     ['score','comboBox','comboV','shieldBox','shieldV','dist','best','spd',
@@ -58,6 +85,9 @@ export const UI = (() => {
     el.best.textContent = SaveManager.self().best.toLocaleString();
     el.menuBest.textContent = SaveManager.self().best.toLocaleString();
     if(el.rankV) el.rankV.textContent = '—';
+
+    setHUDVisible(false);
+    startTipCycle();
 
     document.querySelectorAll('.gtab').forEach(b => {
       b.onclick = () => {
@@ -158,9 +188,15 @@ export const UI = (() => {
     const r = Math.min(1, Math.max(0, kmh/240));
     el.gArc.setAttribute('stroke-dashoffset', 169.6*(1-r));
     el.gArc.setAttribute('stroke', S.nitroOn ? '#41e0ff' : '#ffb03a');
-    el.gNeedle.setAttribute('transform', `rotate(${-90+180*r} 66 66)`);
+    el.gNeedle.setAttribute('transform', `rotate(${-90+180*r} 72 72)`);
     el.dist.textContent = (S.dist/1000).toFixed(2) + ' km';
-    el.nitroFill.style.width = (S.nitro/(100+SaveManager.self().upg[1]*20)*100) + '%';
+
+    // Outer N2O Arc on Gauge
+    const nRatio = Math.min(1, Math.max(0, S.nitro / (100 + SaveManager.self().upg[1] * 20)));
+    const nArc = byId('nArc');
+    if(nArc) nArc.setAttribute('stroke-dashoffset', 207.3 * (1 - nRatio));
+
+    el.nitroFill.style.width = (nRatio * 100) + '%';
     el.tNitro.classList.toggle('ready', S.nitro > 25 && !S.nitroOn);
     el.tNitro.classList.toggle('empty', S.nitro < 8);
     el.nitrofx.classList.toggle('on', S.nitroOn);
@@ -170,16 +206,23 @@ export const UI = (() => {
       el.shieldBox.style.display = 'block';
       el.shieldV.textContent = '🛡 SHIELD ×' + S.shield;
     } else el.shieldBox.style.display = 'none';
+
+    // Integrated combo badge in score box
+    const scoreCombo = byId('scoreCombo');
     if(S.combo > 1){
-      el.comboBox.style.display = 'block';
-      const txt = 'COMBO ×' + mult.toFixed(1);
-      if(el.comboV.textContent !== txt){
-        el.comboV.textContent = txt;
-        el.comboBox.classList.remove('pop');
-        void el.comboBox.offsetWidth;
-        el.comboBox.classList.add('pop');
+      const txt = '×' + mult.toFixed(1);
+      if(scoreCombo.textContent !== txt){
+        scoreCombo.textContent = txt;
+        scoreCombo.classList.remove('pop');
+        void scoreCombo.offsetWidth;
+        scoreCombo.classList.add('pop');
       }
-    } else el.comboBox.style.display = 'none';
+      scoreCombo.classList.remove('hide');
+      el.comboV.textContent = 'COMBO ' + txt;
+    } else {
+      scoreCombo.classList.add('hide');
+      el.comboV.textContent = 'COMBO ×1.0';
+    }
   }
 
   function showOv(ov){
@@ -193,7 +236,7 @@ export const UI = (() => {
 
   const pips = (lv,max) => '<em>' + '■'.repeat(lv) + '</em><i>' + '□'.repeat(max-lv) + '</i>';
   const bw = v => Math.round(Math.min(1, Math.max(.06, (v-.8)/.45)) * 100);
-  const sbar = (n,v) => `<div class="sbar"><em>${n}</em><u style="--w:${bw(v)}%" aria-hidden="true"></u></div>`;
+  const sbar = (n,v,txt) => `<div class="sbar"><span class="sbar-label">${n}</span><u style="--w:${bw(v)}%" aria-hidden="true"></u><span class="sbar-val">${txt}</span></div>`;
 
   function renderUpg(){
     const save = SaveManager.self();
@@ -228,23 +271,42 @@ export const UI = (() => {
     VEHICLES.forEach(c => {
       const owned = !!(save.vehicles & (1 << c.id)), sel = save.vehSel === c.id;
       const card = document.createElement('div');
-      card.className = 'carcard' + (sel ? ' sel' : '') + (c.type === 'bike' ? ' bike' : '');
-      card.innerHTML = `<div class="carpic" aria-hidden="true" style="--pc:${css(c.color)};--sc:${css(c.stripe)}"><i></i><i></i></div>
-        <span class="vtag ${c.type}">${c.type === 'bike' ? '🏍 BIKE' : '🚗 CAR'}</span>
+      card.className = 'carcard' + (sel ? ' sel active-card' : '') + (c.type === 'bike' ? ' bike' : '');
+
+      const speedVal = Math.round(c.speed * 200) + ' KM/H';
+      const gripVal = c.handl.toFixed(2) + 'x';
+      const nitroVal = (c.nitro >= 1 ? '+' : '') + Math.round((c.nitro - 1) * 100) + '%';
+
+      const previewHtml = c.type === 'bike'
+        ? `<div class="bikepic" aria-hidden="true" style="--pc:${css(c.color)};--sc:${css(c.stripe)}"><div class="btank"></div><div class="bseat"></div><div class="bfork"></div><i class="bw fw"></i><i class="bw rw"></i></div>`
+        : `<div class="carpic" aria-hidden="true" style="--pc:${css(c.color)};--sc:${css(c.stripe)}"><i></i><i></i></div>`;
+
+      card.innerHTML = `${previewHtml}
+        <div><span class="vtag ${c.type}">${c.type === 'bike' ? '🏍 BIKE' : '🚗 CAR'}</span></div>
         <b>${c.name}</b><div class="en">${c.en}${c.armor ? ' · 🛡×'+c.armor : ''}</div>
-        ${sbar('SPEED',c.speed)}${sbar('GRIP',c.handl)}${sbar('NITRO',c.nitro)}<p>${c.desc}</p>`;
+        <div class="stat-section">
+          ${sbar('SPD', c.speed, speedVal)}
+          ${sbar('GRP', c.handl, gripVal)}
+          ${sbar('N2O', c.nitro, nitroVal)}
+        </div>
+        <p>${c.desc}</p>`;
+
+      const btnWrap = document.createElement('div');
+      btnWrap.className = 'card-btn-wrap';
+
       const btn = document.createElement('button'); btn.type = 'button';
-      if(sel){ btn.className='abtn small'; btn.disabled=true; btn.textContent='✓ ACTIVE'; }
-      else if(owned){
-        btn.className='abtn cyan small'; btn.textContent='SELECT';
+      if(sel){
+        btn.className = 'abtn small active-btn'; btn.disabled = true; btn.textContent = '✓ CURRENTLY EQUIPPED';
+      }else if(owned){
+        btn.className = 'abtn cyan small select-btn'; btn.textContent = 'SELECT VEHICLE';
         btn.onclick = () => {
           save.vehSel = c.id; Game.rebuildPlayer(); SaveManager.persist();
           renderCars(); Audio.sfx.click();
           toast((c.type === 'bike' ? '🏍' : '🚗') + ' Switched to: ' + c.name);
         };
       }else{
-        btn.className='abtn small' + (save.gold >= c.price ? '' : ' dis');
-        btn.textContent='BUY 💰' + fmtG(c.price);
+        btn.className = 'abtn small buy-btn' + (save.gold >= c.price ? ' gold-btn' : ' dis');
+        btn.innerHTML = 'BUY <span class="buy-coin">💰 ' + fmtG(c.price) + '</span>';
         btn.onclick = () => {
           if(save.gold < c.price) return;
           save.gold -= c.price; save.vehicles |= 1 << c.id; save.vehSel = c.id;
@@ -253,7 +315,9 @@ export const UI = (() => {
           toast('🎉 Purchased: ' + c.name + '!');
         };
       }
-      card.appendChild(btn); grid.appendChild(card);
+      btnWrap.appendChild(btn);
+      card.appendChild(btnWrap);
+      grid.appendChild(card);
     });
     gEl.carList.appendChild(grid);
   }
@@ -320,14 +384,15 @@ export const UI = (() => {
     Social.renderLeaderboard(gEl.lbList);
     gEl.codeOut.value = SaveManager.encode();
   }
-  function openGarage(){ Audio.sfx.click(); refreshGarage(); hideOv(el.menu); showOv(gEl.garage); }
+  function openGarage(){ Audio.sfx.click(); refreshGarage(); setHUDVisible(false); hideOv(el.menu); showOv(gEl.garage); }
   function closeGarage(){
-    Audio.sfx.click(); hideOv(gEl.garage); showOv(el.menu);
+    Audio.sfx.click(); setHUDVisible(false); hideOv(gEl.garage); showOv(el.menu);
     const b = document.getElementById('btnGarage'); if(b) b.focus();
     refreshGold();
   }
 
   function showGameOver(r){
+    setHUDVisible(false);
     el.goScore.textContent = r.score.toLocaleString();
     el.goGold.textContent = '+' + r.gold;
     el.goDist.textContent = (r.dist/1000).toFixed(2) + ' km';
@@ -352,6 +417,7 @@ export const UI = (() => {
   }
 
   function toMenu(){
+    setHUDVisible(false);
     hideOv(el.over); hideOv(el.pauseOv); hideOv(gEl.garage);
     showOv(el.menu);
     el.menuBest.textContent = SaveManager.self().best.toLocaleString();
@@ -359,6 +425,7 @@ export const UI = (() => {
     el.count.style.display = 'none';
   }
   function startCountdown(){
+    setHUDVisible(true);
     el.count.textContent = '3';
     el.count.style.display = 'flex';
     el.count.classList.remove('go');
@@ -387,6 +454,7 @@ export const UI = (() => {
     init, toast, announce, banner, floater, updateHUD, showOv, hideOv,
     refreshNameUI, refreshGold, openGarage, closeGarage, refreshGarage,
     showGameOver, toMenu, startCountdown, copySave,
+    setHUDVisible,
     get gEl(){ return gEl; }, get el(){ return el; }
   };
 })();

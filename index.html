@@ -27,8 +27,11 @@
   <!-- HUD -->
   <div id="hud" role="group" aria-label="HUD">
     <div id="hudTL">
-      <div class="plate" id="scoreBox"><i>SCORE</i><b id="score">0</b></div>
-      <div class="plate" id="comboBox"><b id="comboV">COMBO ×1.0</b></div>
+      <div class="plate" id="scoreBox">
+        <i>SCORE</i><b id="score">0</b>
+        <span id="scoreCombo" class="combo-badge hide">×1.0</span>
+      </div>
+      <div class="plate" id="comboBox" style="display:none!important"><b id="comboV">COMBO ×1.0</b></div>
       <div class="plate" id="shieldBox"><b id="shieldV">🛡 SHIELD ×1</b></div>
     </div>
     <div id="hudTR">
@@ -40,20 +43,25 @@
       <button class="ibtn" id="btnMute" type="button" aria-label="Mute (M)" aria-pressed="false">🔊</button>
     </div>
     <div id="cluster">
-      <svg id="gauge" width="132" height="76" viewBox="0 0 132 76" aria-hidden="true">
-        <path d="M12 66 A54 54 0 0 1 120 66" stroke="#232b47" stroke-width="10" fill="none" stroke-linecap="round"/>
-        <path id="gArc" d="M12 66 A54 54 0 0 1 120 66" stroke="#ffb03a" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6"/>
-        <g id="gNeedle" transform="rotate(-90 66 66)"><line x1="66" y1="66" x2="66" y2="24" stroke="#ff5040" stroke-width="4" stroke-linecap="round"/></g>
-        <circle cx="66" cy="66" r="6" fill="#ff5040"/>
+      <svg id="gauge" width="144" height="82" viewBox="0 0 144 82" aria-hidden="true">
+        <!-- Outer Nitro Arc Gauge -->
+        <path d="M 6 72 A 66 66 0 0 1 138 72" stroke="rgba(255,255,255,0.12)" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path id="nArc" d="M 6 72 A 66 66 0 0 1 138 72" stroke="#41e0ff" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="207.3" stroke-dashoffset="0"/>
+        <!-- Speed Arc Gauge -->
+        <path d="M 18 72 A 54 54 0 0 1 126 72" stroke="#232b47" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <path id="gArc" d="M 18 72 A 54 54 0 0 1 126 72" stroke="#ffb03a" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6"/>
+        <g id="gNeedle" transform="rotate(-90 72 72)"><line x1="72" y1="72" x2="72" y2="30" stroke="#ff5040" stroke-width="4" stroke-linecap="round"/></g>
+        <circle cx="72" cy="72" r="6" fill="#ff5040"/>
       </svg>
       <div id="spdRow"><span id="spd">0</span><small>KM/H</small></div>
     </div>
-    <div id="nitroWrap" aria-hidden="true"><label>N₂O</label><div id="nitroBar"><div id="nitroFill"></div></div></div>
+    <!-- Hidden standalone Nitro Bar for compatibility -->
+    <div id="nitroWrap" style="display:none!important" aria-hidden="true"><label>N₂O</label><div id="nitroBar"><div id="nitroFill"></div></div></div>
     <button id="t-left" class="tbtn" type="button" aria-label="Steer left">◀</button>
     <button id="t-right" class="tbtn" type="button" aria-label="Steer right">▶</button>
     <button id="t-brake" class="tbtn" type="button" aria-label="Brake">▼</button>
     <button id="t-nitro" class="tbtn" type="button" aria-label="Nitro boost">N₂O</button>
-    <button id="t-horn" class="tbtn" type="button" aria-label="Horn">HORN</button>
+    <button id="t-horn" class="tbtn" type="button" aria-label="Horn">📯</button>
   </div>
 
   <div id="floaters" aria-hidden="true"></div>
@@ -83,11 +91,27 @@
         <div class="posts"></div>
       </div>
       <div class="mside">
-        <div class="mrow">
-          <div class="plate"><span>👤 <b id="menuName" style="color:var(--cyan)">DRIVER</b></span></div>
-          <div class="plate"><span>🏆 BEST <b id="menuBest" style="color:var(--gold)">0</b></span></div>
-          <div class="plate goldplate"><span>💰 <b id="menuGold">0</b></span></div>
+        <!-- Consolidated Player Card -->
+        <div class="player-card" id="playerCard">
+          <div class="pc-row">
+            <span class="pc-driver">👤 <b id="menuName">DRIVER</b> <button class="icon-btn" id="btnName" type="button" aria-label="Change driver name" title="Change Name">✏️</button></span>
+            <span class="pc-gold">💰 <b id="menuGold">0</b></span>
+          </div>
+          <div class="pc-sub">
+            <span>🏆 BEST: <b id="menuBest">0</b> PTS</span>
+            <span class="pc-status">READY TO RACE</span>
+          </div>
         </div>
+
+        <div class="mrow2">
+          <button class="abtn big" id="btnStart" type="button" data-autofocus>🔑 START ENGINE</button>
+          <button class="abtn cyan" id="btnGarage" type="button">🔧 GARAGE</button>
+        </div>
+
+        <!-- Single cycling Tip Ticker -->
+        <div class="tip-ticker" id="menuTip" aria-live="polite">💡 <b>TIP:</b> Near misses & close passes build your score combo!</div>
+
+        <!-- Relocated Controls Chips -->
         <div class="chips">
           <div class="chip"><b>◀ ▶</b>Steer</div>
           <div class="chip"><b>N₂O</b>Space</div>
@@ -95,15 +119,6 @@
           <div class="chip"><b>H</b>Horn</div>
           <div class="chip"><b>Tab</b>Nav</div>
         </div>
-        <div class="mrow2">
-          <button class="abtn big" id="btnStart" type="button" data-autofocus>🔑 START ENGINE</button>
-          <button class="abtn cyan" id="btnGarage" type="button">🔧 GARAGE</button>
-        </div>
-        <div class="hint">📱 Portrait auto-rotates · near misses build combos<br>
-        🏁 Speed banks · clean checkpoints · combo milestones · horn<br>
-        💾 Copy save code to share with friends — race each other!<br>
-        🏍 Unlock bikes · 🏁 Beat friends · 🏆 Climb the leaderboard</div>
-        <div><button class="abtn ghost small" id="btnName" type="button">✏️ CHANGE NAME</button></div>
       </div>
     </div>
   </div>

@@ -50,20 +50,20 @@ export const UPGRADES = [
 ];
 
 export const VEHICLES = [
-  {id:0,name:'BLAZE',type:'car',en:'ALL-ROUNDER',color:0xff5a3c,stripe:0xf5efe0,price:0,speed:1.00,handl:1.00,nitro:1.00,armor:0,desc:'Balanced highway coupe'},
-  {id:1,name:'BREEZE',type:'car',en:'COASTAL',color:0x2fb9a8,stripe:0xffffff,price:3000,speed:0.94,handl:1.25,nitro:1.00,armor:0,desc:'Nimble coastal build'},
-  {id:2,name:'NIGHT OWL',type:'car',en:'SPEED KING',color:0x33406e,stripe:0x41e0ff,price:6000,speed:1.12,handl:0.88,nitro:1.15,armor:0,desc:'Top-speed night beast'},
-  {id:3,name:'RHINO',type:'car',en:'ARMORED',color:0xe07030,stripe:0x1c2128,price:10000,speed:0.92,handl:0.95,nitro:0.95,armor:2,desc:'Steel beast · 2 factory shields'},
-  {id:4,name:'PHANTOM',type:'car',en:'LEGEND',color:0xe8e6f0,stripe:0xffb03a,price:20000,speed:1.10,handl:1.15,nitro:1.20,armor:1,desc:'Legendary all-rounder'},
-  {id:5,name:'ROYAL',type:'bike',en:'CLASSIC 350',color:0x1a1a1a,stripe:0xc0c0c0,price:2500,speed:0.88,handl:1.35,nitro:0.95,armor:0,desc:'Iconic Indian motorcycle'},
-  {id:6,name:'BAJAJ',type:'bike',en:'PULSAR NS',color:0xe05040,stripe:0xf2efe4,price:4500,speed:1.05,handl:1.20,nitro:1.10,armor:0,desc:'Sport bike · quick acceleration'},
-  {id:7,name:'KTM',type:'bike',en:'DUKE 390',color:0xff8c00,stripe:0x1c1c1c,price:8000,speed:1.18,handl:1.30,nitro:1.05,armor:0,desc:'Aggressive naked sport'},
-  {id:8,name:'HARLEY',type:'bike',en:'STREET 750',color:0x1c1c1c,stripe:0xff6600,price:15000,speed:1.00,handl:1.10,nitro:1.25,armor:1,desc:'Deep torque cruiser'},
-  {id:9,name:'APACHE',type:'bike',en:'RTR 200',color:0x20304a,stripe:0x41e0ff,price:3500,speed:0.95,handl:1.28,nitro:1.08,armor:0,desc:'TVS racing bike'},
-  {id:10,name:'MONSOON GT',type:'car',en:'RAIN RACER',color:0x236b8e,stripe:0x9ee9ff,price:12000,speed:1.08,handl:1.18,nitro:1.12,armor:0,desc:'Wet-road specialist with sharp turn-in'},
-  {id:11,name:'DESERT X',type:'car',en:'RALLY CROSS',color:0xd88932,stripe:0x1d2028,price:16000,speed:1.04,handl:1.05,nitro:1.18,armor:1,desc:'Rally build with a reinforced frame'},
-  {id:12,name:'STREET 900',type:'bike',en:'NIGHT SPORT',color:0x7d4bd8,stripe:0x41e0ff,price:12000,speed:1.16,handl:1.34,nitro:1.14,armor:0,desc:'High-rev street machine for clean lines'},
-  {id:13,name:'APEX 600',type:'bike',en:'TRACK SPEC',color:0xd9d9df,stripe:0xff5040,price:18000,speed:1.22,handl:1.22,nitro:1.10,armor:0,desc:'Lightweight track bike built for top speed'}
+  {id:0,name:'BLAZE',type:'car',en:'ALL-ROUNDER',color:0xff5a3c,stripe:0xf5efe0,price:0,speed:1.00,handl:1.00,nitro:1.00,armor:0,desc:'Starter coupe. Perfectly balanced stats to guarantee equal performance in every situation.'},
+  {id:1,name:'BREEZE',type:'car',en:'COASTAL',color:0x2fb9a8,stripe:0xffffff,price:3000,speed:0.94,handl:1.25,nitro:1.00,armor:0,desc:'Nimble coastal build with high grip and sharp turn-in for weaving through tight traffic.'},
+  {id:2,name:'NIGHT OWL',type:'car',en:'SPEED KING',color:0x33406e,stripe:0x41e0ff,price:6000,speed:1.12,handl:0.88,nitro:1.15,armor:0,desc:'Pure highway speed. A high-rev night beast engineered for straight-line domination.'},
+  {id:3,name:'RHINO',type:'car',en:'ARMORED',color:0xe07030,stripe:0x1c2128,price:10000,speed:0.92,handl:0.95,nitro:0.95,armor:2,desc:'Steel beast equipped with 2 factory shields. Absorbs direct collisions effortlessly.'},
+  {id:4,name:'PHANTOM',type:'car',en:'LEGEND',color:0xe8e6f0,stripe:0xffb03a,price:20000,speed:1.10,handl:1.15,nitro:1.20,armor:1,desc:'Legendary build with maxed-out performance and active shield protection.'},
+  {id:5,name:'ROYAL',type:'bike',en:'CLASSIC 350',color:0x1a1a1a,stripe:0xc0c0c0,price:2500,speed:0.88,handl:1.35,nitro:0.95,armor:0,desc:'Iconic Classic 350 experience: incredible grip and signature highway presence.'},
+  {id:6,name:'BAJAJ',type:'bike',en:'PULSAR NS',color:0xe05040,stripe:0xf2efe4,price:4500,speed:1.05,handl:1.20,nitro:1.10,armor:0,desc:'Responsive sport bike featuring rapid acceleration and nimble lane filtering.'},
+  {id:7,name:'KTM',type:'bike',en:'DUKE 390',color:0xff8c00,stripe:0x1c1c1c,price:8000,speed:1.18,handl:1.30,nitro:1.05,armor:0,desc:'Aggressive naked street fighter built for high-rev highway overtaking.'},
+  {id:8,name:'HARLEY',type:'bike',en:'STREET 750',color:0x1c1c1c,stripe:0xff6600,price:15000,speed:1.00,handl:1.10,nitro:1.25,armor:1,desc:'Deep torque cruiser with a factory shield and heavy nitro capacity.'},
+  {id:9,name:'APACHE',type:'bike',en:'RTR 200',color:0x20304a,stripe:0x41e0ff,price:3500,speed:0.95,handl:1.28,nitro:1.08,armor:0,desc:'TVS racing bike built for quick lane transitions and smooth handling.'},
+  {id:10,name:'MONSOON GT',type:'car',en:'RAIN RACER',color:0x236b8e,stripe:0x9ee9ff,price:12000,speed:1.08,handl:1.18,nitro:1.12,armor:0,desc:'Wet-road specialist featuring sharp turn-in and high-speed stability.'},
+  {id:11,name:'DESERT X',type:'car',en:'RALLY CROSS',color:0xd88932,stripe:0x1d2028,price:16000,speed:1.04,handl:1.05,nitro:1.18,armor:1,desc:'Rally cross build with a reinforced frame for enduring heavy impacts.'},
+  {id:12,name:'STREET 900',type:'bike',en:'NIGHT SPORT',color:0x7d4bd8,stripe:0x41e0ff,price:12000,speed:1.16,handl:1.34,nitro:1.14,armor:0,desc:'High-rev night machine tailored for carving clean lines through dense traffic.'},
+  {id:13,name:'APEX 600',type:'bike',en:'TRACK SPEC',color:0xd9d9df,stripe:0xff5040,price:18000,speed:1.22,handl:1.22,nitro:1.10,armor:0,desc:'Ultra-lightweight track spec motorcycle engineered for absolute speed records.'}
 ];
 
 export const ACHIEVEMENTS = [
